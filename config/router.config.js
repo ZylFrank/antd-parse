@@ -289,6 +289,25 @@ export default [
           },
         ],
       },
+      // system
+      {
+        name: 'system',
+        icon: 'setting',
+        path: '/system',
+        routes: [
+          {
+            path: '/system/role',
+            name: 'role',
+            component: './System/Role',
+          },
+          {
+            path: '/system/user',
+            name: 'user',
+            component: './System/User',
+          },
+        ],
+      },
+
       {
         component: '404',
       },

@@ -37,10 +37,10 @@ const plugins = [
         : false,
       ...(!TEST && os.platform() === 'darwin'
         ? {
-            dll: {
-              include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
-              exclude: ['@babel/runtime', 'netlify-lambda'],
-            },
+            // dll: {
+            //   include: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
+            //   exclude: ['@babel/runtime', 'netlify-lambda'],
+            // },
             hardSource: false,
           }
         : {}),
