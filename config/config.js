@@ -7,7 +7,13 @@ import slash from 'slash2';
 
 const { pwa, primaryColor } = defaultSettings;
 // preview.pro.ant.design only do not use in your production ; preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
-const { ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION, TEST } = process.env;
+const {
+  ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION,
+  TEST,
+  APP_ID,
+  SERVER_URL,
+  SERVER_PORT,
+} = process.env;
 
 const plugins = [
   [
@@ -65,6 +71,9 @@ export default {
   define: {
     ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION:
       ANT_DESIGN_PRO_ONLY_DO_NOT_USE_IN_YOUR_PRODUCTION || '', // preview.pro.ant.design only do not use in your production ; preview.pro.ant.design 专用环境变量，请不要在你的项目中使用它。
+    APP_ID: APP_ID || '',
+    SERVER_URL: SERVER_URL || '',
+    SERVER_PORT: SERVER_PORT || '',
   },
   treeShaking: true,
   targets: {

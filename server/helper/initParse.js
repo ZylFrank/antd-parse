@@ -5,7 +5,7 @@ module.exports = () => {
   const serverURL = process.env.SERVER_URL || 'http://localhost';
   const parseUri = `${serverURL}:${port}/api`;
 
-  Parse.initialize(process.env.APP_ID, process.env.MASTER_KEY);
+  Parse.initialize(process.env.APP_ID, '', process.env.MASTER_KEY);
   Parse.serverURL = parseUri;
 
   Parse.Object.prototype.insertOne = function insertOne(values = {}) {

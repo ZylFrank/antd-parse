@@ -298,12 +298,12 @@ export default [
           {
             path: '/system/role',
             name: 'role',
-            component: './System/Role',
+            component: './System/Role/index',
           },
           {
             path: '/system/user',
             name: 'user',
-            component: './System/User',
+            component: './System/User/index',
           },
         ],
       },
