@@ -4,6 +4,13 @@ const Promise = require('bluebird');
 const { checkDuplication } = require('../../utils/user');
 
 Parse.Cloud.define('fetchUserList', async req => {
+  // 升级到3.0.0的错误处理
+  // throw 'Something went wrong';
+  // throw new Error('Something else went wrong')
+  // throw new Parse.Error(610);
+  // 自定义错误处理
+  // throw new Parse.Error(1001, 'My Error');
+
   const query = new Parse.Query(Parse.User);
 
   const { nickname, username, email } = req.params;
@@ -45,11 +52,11 @@ Parse.Cloud.define('createUser', async req => {
   delete values.roles;
 
   if (!_.isPlainObject(values)) {
-    return Parse.Error(600, '参数values有误');
+    throw new Error('参数有误');
   }
   const errMsg = await checkDuplication(values);
   if (errMsg) {
-    return Parse.Error(600, errMsg);
+    throw new Error(errMsg);
   }
   const user = new Parse.User();
   await user.signUp({
@@ -78,21 +85,21 @@ Parse.Cloud.define('updateUser', async req => {
   delete values.roles;
 
   if (typeof id !== 'string') {
-    return Parse.Error(600, '参数id有误');
+    throw new Error('参数id有误');
   }
   if (!_.isPlainObject(values)) {
-    return Parse.Error(600, '参数values有误');
+    throw new Error('参数有误');
   }
   const user = await new Parse.Query(Parse.User)
     .equalTo('deleted', false)
     .get(id, { useMasterKey: true });
   if (!user) {
-    return Parse.Error(601, '用户不存在');
+    throw new Error('用户不存在');
   }
 
   const errMsg = await checkDuplication(values, user);
   if (errMsg) {
-    return Parse.Error(600, errMsg);
+    throw new Error(errMsg);
   }
 
   const addRoleItems = selectedRoles.filter(item => !roles.includes(item));
@@ -126,4 +133,16 @@ Parse.Cloud.define('updateUser', async req => {
 
   await user.save(values, { useMasterKey: true });
   return user;
+});
+
+Parse.Cloud.define('fetchUser', async req => {
+  const { id } = req.params;
+  const queryUser = new Parse.Query(Parse.User);
+  const queryRole = new Parse.Query(Parse.Role);
+  const user = await queryUser.equalTo('deleted', false).get(id, { useMasterKey: true });
+  const roles = await queryRole.containedIn('users', [user]).find({ useMasterKey: true });
+  return {
+    user,
+    roles,
+  };
 });

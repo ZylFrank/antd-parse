@@ -2,8 +2,8 @@ const Parse = require('parse/node');
 
 module.exports = done => {
   const roleACL = new Parse.ACL();
-  roleACL.setPublicReadAccess(false);
-  roleACL.setPublicWriteAccess(false);
+  roleACL.setPublicReadAccess(true);
+  roleACL.setPublicWriteAccess(true);
   const role = new Parse.Role('admin', roleACL);
   role.set('status', true);
   role.set('displayName', '管理员');

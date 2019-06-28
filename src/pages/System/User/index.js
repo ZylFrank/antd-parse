@@ -1,10 +1,23 @@
 import React, { PureComponent } from 'react';
-import { Card, Button, Tooltip, Icon, Modal, Form, Divider, Table, message, Input } from 'antd';
+import {
+  Card,
+  Button,
+  Tooltip,
+  Icon,
+  Modal,
+  Form,
+  Divider,
+  Table,
+  message,
+  Input,
+  Select,
+} from 'antd';
 import { connect } from 'dva';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
 
 const FormItem = Form.Item;
 const { confirm } = Modal;
+const { Option } = Select;
 
 const formItemLayout = {
   labelCol: {
@@ -15,8 +28,9 @@ const formItemLayout = {
   },
 };
 
-@connect(({ userList }) => ({
+@connect(({ userList, global }) => ({
   userList,
+  global,
 }))
 @Form.create()
 class userListPage extends PureComponent {
@@ -25,21 +39,31 @@ class userListPage extends PureComponent {
     dispatch({
       type: 'userList/fetch',
     });
+    dispatch({
+      type: 'global/fetchAllRoles',
+    });
   }
 
   render() {
-    const { userList, form, dispatch } = this.props;
+    const { userList, form, dispatch, global } = this.props;
     const { getFieldDecorator, validateFields, resetFields } = form;
-    const { list = [], pagination, isEdit, modalVisible, editInfo } = userList;
-    const { nickname, username, email } = editInfo;
+    const { list = [], pagination, isEdit, modalVisible, userRoles, userInfo } = userList;
+    const { allRoles } = global;
+    const { nickname, username, email } = userInfo;
+    const roleValue = userRoles.map(item => item.id);
 
     const editUser = record => {
       dispatch({
         type: 'userList/save',
         payload: {
-          editInfo: record.toJSON(),
           modalVisible: true,
           isEdit: true,
+        },
+      });
+      dispatch({
+        type: 'userList/getItem',
+        payload: {
+          id: record.id,
         },
       });
     };
@@ -73,7 +97,7 @@ class userListPage extends PureComponent {
         type: 'userList/save',
         payload: {
           modalVisible: false,
-          editInfo: {},
+          userInfo: {},
         },
       });
       setTimeout(() => {
@@ -92,7 +116,9 @@ class userListPage extends PureComponent {
             dispatch({
               type: 'userList/updateItem',
               payload: {
-                ...values,
+                values,
+                editingUserRoles: userRoles,
+                id: userInfo.objectId,
               },
             });
           } else {
@@ -109,7 +135,6 @@ class userListPage extends PureComponent {
         }
       });
     };
-
     const columns = [
       {
         title: '昵称',
@@ -156,7 +181,15 @@ class userListPage extends PureComponent {
             </span>
           }
         >
-          <Table rowKey={r => r.id} dataSource={list} columns={columns} pagination={pagination} />
+          <Table
+            rowKey={r => r.id}
+            dataSource={list}
+            columns={columns}
+            pagination={{
+              ...pagination,
+              showTotal: total => `共${total}条`,
+            }}
+          />
           <Modal
             title={isEdit ? '修改用户信息' : '添加用户信息'}
             visible={modalVisible}
@@ -180,9 +213,26 @@ class userListPage extends PureComponent {
               </FormItem>
               <FormItem label="邮箱" {...formItemLayout}>
                 {getFieldDecorator('email', {
-                  rules: [{ required: true, message: '请输入邮箱地址' }],
+                  rules: [
+                    { required: true, message: '请输入邮箱地址' },
+                    { type: 'email', message: '请输入正确的邮箱地址' },
+                  ],
                   initialValue: email,
                 })(<Input />)}
+              </FormItem>
+              <FormItem label="角色" {...formItemLayout}>
+                {getFieldDecorator('roles', {
+                  rules: [{ required: true, message: '请选择用户角色' }],
+                  initialValue: roleValue,
+                })(
+                  <Select mode="multiple">
+                    {allRoles.map(item => (
+                      <Option key={item.objectId} value={item.objectId}>
+                        {item.displayName}
+                      </Option>
+                    ))}
+                  </Select>
+                )}
               </FormItem>
             </Form>
           </Modal>

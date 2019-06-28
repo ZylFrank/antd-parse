@@ -1,4 +1,5 @@
 import { queryNotices } from '@/services/api';
+import { getAllRoles } from '@/services/global';
 
 export default {
   namespace: 'global',
@@ -6,6 +7,7 @@ export default {
   state: {
     collapsed: false,
     notices: [],
+    allRoles: [],
   },
 
   effects: {
@@ -65,9 +67,24 @@ export default {
         },
       });
     },
+    *fetchAllRoles(_, { call, put }) {
+      const response = yield call(getAllRoles);
+      yield put({
+        type: 'save',
+        payload: {
+          allRoles: response,
+        },
+      });
+    },
   },
 
   reducers: {
+    save(state, { payload }) {
+      return {
+        ...state,
+        ...payload,
+      };
+    },
     changeLayoutCollapsed(state, { payload }) {
       return {
         ...state,

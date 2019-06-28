@@ -1,4 +1,4 @@
-import { queryList } from '../services/userList';
+import { queryList, createUser, getUserItem, updateUser } from '../services/userList';
 
 export default {
   namespace: 'userList',
@@ -7,7 +7,8 @@ export default {
     isEdit: false,
     modalVisible: false,
     loading: true,
-    editInfo: {},
+    userInfo: {},
+    userRoles: [],
   },
 
   effects: {
@@ -16,6 +17,30 @@ export default {
       yield put({
         type: 'save',
         payload: response,
+      });
+    },
+    *addItem({ payload }, { call, put }) {
+      yield call(createUser, payload);
+      yield put({
+        type: 'fetch',
+      });
+    },
+    *updateItem({ payload }, { call, put }) {
+      const { id, editingUserRoles, values } = payload;
+      yield call(updateUser, { id, roles: editingUserRoles.map(item => item.id), values });
+      yield put({
+        type: 'fetch',
+      });
+    },
+
+    *getItem({ payload }, { call, put }) {
+      const { user, roles } = yield call(getUserItem, payload);
+      yield put({
+        type: 'save',
+        payload: {
+          userInfo: user.toJSON(),
+          userRoles: roles,
+        },
       });
     },
   },
