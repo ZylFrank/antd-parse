@@ -40,8 +40,8 @@ class Role extends PureComponent {
   render() {
     const { role, form, dispatch } = this.props;
     const { getFieldDecorator, validateFields, resetFields } = form;
-    const { list = [], pagination = {}, isEdit, modalVisible, editRoleInfo } = role;
-    const { name, displayName, status } = editRoleInfo;
+    const { list = [], pagination = {}, isEdit, modalVisible, editRoleInfo = {} } = role;
+    const { attributes: { name = '', displayName = '', status = false } = {} } = editRoleInfo;
 
     const editUser = record => {
       dispatch({
@@ -49,7 +49,7 @@ class Role extends PureComponent {
         payload: {
           modalVisible: true,
           isEdit: true,
-          editRoleInfo: record.toJSON(),
+          editRoleInfo: record,
         },
       });
     };
@@ -61,7 +61,7 @@ class Role extends PureComponent {
           dispatch({
             type: 'role/remove',
             payload: {
-              id: record.objectId,
+              id: record.id,
             },
           });
         },
@@ -135,10 +135,11 @@ class Role extends PureComponent {
             dispatch({
               type: 'role/create',
               payload: {
-                values,
+                ...values,
               },
             });
           }
+          colseModal();
         } else {
           message.info(err[Object.keys(err)[0]].errors[0].message);
         }
@@ -193,13 +194,10 @@ class Role extends PureComponent {
               })(<Input />)}
             </FormItem>
             <FormItem label="状态" {...formItemLayout}>
-              {getFieldDecorator('status')(
-                <Switch
-                  defaultChecked={status || false}
-                  checkedChildren="启用"
-                  unCheckedChildren="禁用"
-                />
-              )}
+              {getFieldDecorator('status', {
+                valuePropName: 'checked',
+                initialValue: status || false,
+              })(<Switch checkedChildren="启用" unCheckedChildren="禁用" />)}
             </FormItem>
           </Form>
         </Modal>
