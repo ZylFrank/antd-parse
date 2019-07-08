@@ -1,3 +1,4 @@
+import qs from 'qs';
 import { queryList, createUser, getUserItem, updateUser } from '../services/userList';
 
 export default {
@@ -9,14 +10,25 @@ export default {
     loading: true,
     userInfo: {},
     userRoles: [],
+    query: {},
   },
 
   effects: {
     *fetch({ payload }, { call, put }) {
+      yield put({
+        type: 'save',
+        payload: {
+          query: payload,
+          loading: true,
+        },
+      });
       const response = yield call(queryList, payload);
       yield put({
         type: 'save',
-        payload: response,
+        payload: {
+          ...response,
+          loading: false,
+        },
       });
     },
     *addItem({ payload }, { call, put }) {
@@ -54,10 +66,18 @@ export default {
     },
   },
 
-  //   subscriptions: {
-  //     setup({ history }) {
-  //       return history.listen(({ pathname, search }) => {
-  //       });
-  //     },
-  //   },
+  subscriptions: {
+    setup({ history, dispatch }) {
+      return history.listen(({ pathname, search }) => {
+        if (pathname === '/system/user') {
+          dispatch({
+            type: 'fetch',
+            payload: {
+              ...qs.parse(search, { ignoreQueryPrefix: true }),
+            },
+          });
+        }
+      });
+    },
+  },
 };

@@ -13,7 +13,10 @@ import {
   Select,
 } from 'antd';
 import { connect } from 'dva';
+import qs from 'qs';
 import PageHeaderWrapper from '@/components/PageHeaderWrapper';
+
+import Filter from './Filter';
 
 const FormItem = Form.Item;
 const { confirm } = Modal;
@@ -45,9 +48,18 @@ class userListPage extends PureComponent {
   }
 
   render() {
-    const { userList, form, dispatch, global } = this.props;
+    const { userList, form, dispatch, global, history } = this.props;
     const { getFieldDecorator, validateFields, resetFields } = form;
-    const { list = [], pagination, isEdit, modalVisible, userRoles, userInfo } = userList;
+    const {
+      list = [],
+      pagination,
+      isEdit,
+      modalVisible,
+      userRoles,
+      userInfo,
+      query,
+      loading,
+    } = userList;
     const { allRoles } = global;
     const { nickname, username, email } = userInfo;
     const roleValue = userRoles.map(item => item.id);
@@ -168,10 +180,27 @@ class userListPage extends PureComponent {
       },
     ];
 
+    const handleSearch = values => {
+      const search = qs.stringify({ ...values });
+      history.push({ search });
+    };
+    const handleReset = () => {
+      history.push();
+    };
+    const filterProps = {
+      query,
+      handleSearch,
+      handleReset,
+    };
+
     return (
       <PageHeaderWrapper title="用户管理">
+        <Card title="查询条件" bordered={false}>
+          <Filter {...filterProps} />
+        </Card>
         <Card
           bordered={false}
+          loading={loading}
           title="用户列表"
           extra={
             <span>
