@@ -52,6 +52,7 @@ This Project Use [Ant Design Pro](https://v2-pro.ant.design/docs/getting-started
 ```bash
 $ git clone https://github.com/ZylFrank/antd-parse.git
 $ cd antd-parse
+$ cp .envsample .env
 $ npm install
 $ npm start         # visit http://localhost:8000
 $ npm server:dev         # visit http://localhost:1337/dashboard/app/antd-parse
