@@ -192,3 +192,62 @@ export const importCDN = (url, name) =>
     };
     document.head.appendChild(dom);
   });
+
+function arrayToTreeByValue(array = [], parent = '') {
+  const items = [];
+  const rest = [];
+
+  array.forEach(item => {
+    if (item.parent === parent) {
+      items.push(item);
+    } else {
+      rest.push(item);
+    }
+  });
+
+  items.sort((prev, next) => prev.order - next.order);
+
+  return items.map(item => {
+    const children = arrayToTreeByValue(rest, item.value);
+
+    if (children.length === 0) {
+      return item;
+    }
+
+    return { ...item, children };
+  });
+}
+
+function getNameMap(array = []) {
+  return array.reduce((object, { label, value }) => {
+    return Object.assign(object, { [value]: label });
+  }, {});
+}
+
+export default class DicMap {
+  constructor(data = []) {
+    this.rawData = data;
+    this.nameMap = getNameMap(data);
+  }
+
+  getName(key) {
+    return this.nameMap[key];
+  }
+
+  getKey(value) {
+    return Object.entries(this.nameMap)
+      .filter(e => e[1] === value)
+      .map(e => e[0])[0];
+  }
+
+  getData(key) {
+    return this.rawData
+      .filter(item => item.parent === key)
+      .map(({ label, value }) => ({ name: label, value }));
+  }
+
+  getTreeData(key) {
+    if (typeof key !== 'string') return [];
+    return arrayToTreeByValue(this.rawData, key);
+  }
+}

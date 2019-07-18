@@ -305,6 +305,11 @@ export default [
             name: 'user',
             component: './System/User/index',
           },
+          {
+            path: '/system/dictionary',
+            name: 'dictionary',
+            component: './System/Dictionary/index',
+          },
         ],
       },
 

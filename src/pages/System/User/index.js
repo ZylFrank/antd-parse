@@ -198,6 +198,7 @@ class userListPage extends PureComponent {
         <Card title="查询条件" bordered={false}>
           <Filter {...filterProps} />
         </Card>
+        <div style={{ height: 10 }} />
         <Card
           bordered={false}
           loading={loading}
